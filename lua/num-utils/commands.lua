@@ -18,6 +18,7 @@ local function get_number_under_cursor()
   end_idx = end_idx - 1
   
   local num_str = line:sub(start_idx, end_idx)
+  print("Debug: Number found - " .. num_str)  -- Debug print
   return num_str, start_idx, end_idx
 end
 
@@ -27,6 +28,7 @@ local function replace_number_under_cursor(new_str)
   if num_str and new_str then
     local new_line = line:sub(1, start_idx - 1) .. new_str .. line:sub(end_idx + 1)
     vim.api.nvim_set_current_line(new_line)
+    print("Debug: Replaced " .. num_str .. " with " .. new_str)  -- Debug print
   else
     print("Invalid number or conversion")
   end
@@ -37,6 +39,7 @@ local function create_conversion_command(name, conversion_func)
     local num_str = get_number_under_cursor()
     if num_str then
       local result = conversion_func(num_str)
+      print("Debug: Conversion result - " .. tostring(result))  -- Debug print
       if result then
         replace_number_under_cursor(result)
       else
