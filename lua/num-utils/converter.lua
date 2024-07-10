@@ -26,23 +26,29 @@ end
 
 M.to_hex = function(num)
   if type(num) == "string" and is_hex(num) then return num end
-  return string.format("0x%X", M.to_decimal(num))
+  local decimal = M.to_decimal(num)
+  if not decimal then return nil end
+  return string.format("0x%X", decimal)
 end
 
 M.to_binary = function(num)
   if type(num) == "string" and is_binary(num) then return num end
   local n = M.to_decimal(num)
+  if not n then return nil end
   local binary = ""
+  if n == 0 then return "0b0" end
   while n > 0 do
     binary = tostring(n % 2) .. binary
     n = math.floor(n / 2)
   end
-  return "0b" .. (binary ~= "" and binary or "0")
+  return "0b" .. binary
 end
 
 M.to_octal = function(num)
   if type(num) == "string" and is_octal(num) then return num end
-  return string.format("0o%o", M.to_decimal(num))
+  local decimal = M.to_decimal(num)
+  if not decimal then return nil end
+  return string.format("0o%o", decimal)
 end
 
 return M

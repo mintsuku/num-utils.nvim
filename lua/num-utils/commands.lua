@@ -11,7 +11,7 @@ local function get_number_under_cursor()
   end
   start_idx = start_idx + 1
   
-  local end_idx = col + 1
+  local end_idx = col
   while end_idx <= #line and line:sub(end_idx, end_idx):match("[%dxXoObB]") do
     end_idx = end_idx + 1
   end
@@ -24,9 +24,11 @@ end
 local function replace_number_under_cursor(new_str)
   local line = vim.api.nvim_get_current_line()
   local num_str, start_idx, end_idx = get_number_under_cursor()
-  if num_str then
+  if num_str and new_str then
     local new_line = line:sub(1, start_idx - 1) .. new_str .. line:sub(end_idx + 1)
     vim.api.nvim_set_current_line(new_line)
+  else
+    print("Invalid number or conversion")
   end
 end
 
@@ -34,7 +36,14 @@ local function create_conversion_command(name, conversion_func)
   vim.api.nvim_create_user_command(name, function()
     local num_str = get_number_under_cursor()
     if num_str then
-      replace_number_under_cursor(conversion_func(num_str))
+      local result = conversion_func(num_str)
+      if result then
+        replace_number_under_cursor(result)
+      else
+        print("Conversion failed")
+      end
+    else
+      print("No valid number found under cursor")
     end
   end, {})
 end
