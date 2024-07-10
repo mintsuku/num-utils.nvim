@@ -12,41 +12,45 @@ local function is_octal(str)
   return str:match("^0o[0-7]+$") ~= nil
 end
 
-M.to_decimal = function(str)
+local function to_decimal_string(str)
   if is_hex(str) then
-    return tonumber(str:sub(3), 16)
+    return tostring(tonumber(str:sub(3), 16))
   elseif is_binary(str) then
-    return tonumber(str:sub(3), 2)
+    return tostring(tonumber(str:sub(3), 2))
   elseif is_octal(str) then
-    return tonumber(str:sub(3), 8)
+    return tostring(tonumber(str:sub(3), 8))
   else
-    return tonumber(str)
+    return str
   end
 end
 
-M.to_hex = function(num)
-  if type(num) == "string" and is_hex(num) then return num end
-  local decimal = M.to_decimal(num)
+M.to_decimal = function(str)
+  return tonumber(to_decimal_string(str))
+end
+
+M.to_hex = function(str)
+  if is_hex(str) then return str end
+  local decimal = tonumber(to_decimal_string(str))
   if not decimal then return nil end
   return string.format("0x%X", decimal)
 end
 
-M.to_binary = function(num)
-  if type(num) == "string" and is_binary(num) then return num end
-  local n = M.to_decimal(num)
-  if not n then return nil end
+M.to_binary = function(str)
+  if is_binary(str) then return str end
+  local decimal = tonumber(to_decimal_string(str))
+  if not decimal then return nil end
+  if decimal == 0 then return "0b0" end
   local binary = ""
-  if n == 0 then return "0b0" end
-  while n > 0 do
-    binary = tostring(n % 2) .. binary
-    n = math.floor(n / 2)
+  while decimal > 0 do
+    binary = tostring(decimal % 2) .. binary
+    decimal = math.floor(decimal / 2)
   end
   return "0b" .. binary
 end
 
-M.to_octal = function(num)
-  if type(num) == "string" and is_octal(num) then return num end
-  local decimal = M.to_decimal(num)
+M.to_octal = function(str)
+  if is_octal(str) then return str end
+  local decimal = tonumber(to_decimal_string(str))
   if not decimal then return nil end
   return string.format("0o%o", decimal)
 end
